@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: head ('Composer | Main page')"></head>
+<body>
+<div class="container">
+    <div class="row" style="height: 40px;">
+        <div class="twelve columns">
+            <span id="info" style="position:absolute; color:#000; z-index:50;"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve columns col-centered">
+            <!--/*@thymesVar id="atlas" type="com.github.viktornar.model.Atlas"*/-->
+            <form method="post" accept-charset="UTF-8" modelAttribute="atlas"
+                  th:action="@{/compose}" class="form-inline" role="form" th:object="${atlas}">
+                <input id="columns" type="hidden" th:field="*{columns}"/>
+                <input id="rows" type="hidden" th:field="*{rows}" />
+                <input id="extent.xmin" type="hidden" th:field="*{extent.xmin}"/>
+                <input id="extent.ymin" type="hidden" th:field="*{extent.ymin}"/>
+                <input id="extent.xmax" type="hidden" th:field="*{extent.xmax}"/>
+                <input id="extent.ymax" type="hidden" th:field="*{extent.ymax}"/>
+                <input id="zoom" type="hidden" th:field="*{zoom}" />
+                <div class="form-group">
+                    <select id="size" class="form-control" th:field="*{size}">
+                        <option value="letter">Letter</option>
+                        <option value="a3">A3</option>
+                        <option value="a4">A4</option>
+                    </select>
+                    <select id="orientation" class="form-control" th:field="*{orientation}">
+                        <option value="landscape">Landscape</option>
+                        <option value="portrait">Portrait</option>
+                    </select>
+                    <input type="submit" value="Print" class="btn btn-default"/>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row" style="height: 40px;">
+        <div class="twelve columns">
+        </div>
+    </div>
+    <div class="row">
+        <div id="map" class="twelve columns composer-container composer-fade-anim"></div>
+    </div>
+    <script>
+        require(["app/main"]);
+    </script>
+</div>
+</body>
+</html>

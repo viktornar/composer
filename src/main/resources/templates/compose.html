@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: head ('Composer | Printer page')"></head>
+<body>
+<br/>
+<br/>
+<div class="row">
+    <div class="twelve columns col-centered"></div>
+</div>
+<div class="container">
+    <table class="table table-bordered">
+        <tbody>
+            <!--/*@thymesVar id="property" type="java.lang.String"*/-->
+            <!--/*@thymesVar id="allProperties" type="java.util.List"*/-->
+            <tr th:each="property, row: ${allProperties}" th:object="${property}">
+                <td th:utext="${property}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
