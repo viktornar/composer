@@ -217,8 +217,7 @@ define([
             this._addRow = domConstruct.create(
                 "div",
                 {
-                    'class': "modifier-btn add-btn",
-                    'innerHTML': "+"
+                    'class': "modifier-btn add-btn"
                 },
                 this._rowModifier
             );
@@ -228,8 +227,7 @@ define([
             this._minusRow = domConstruct.create(
                 "div",
                 {
-                    'class': "modifier-btn subtract-btn",
-                    'innerHTML': "&#8722;"
+                    'class': "modifier-btn subtract-btn"
                 },
                 this._rowModifier
             );
@@ -245,15 +243,13 @@ define([
             );
 
             this._addCol = domConstruct.create("div", {
-                'class': "modifier-btn add-btn",
-                'innerHTML': "+"
+                'class': "modifier-btn add-btn"
             }, this._colModifier);
 
             this._createInnerText(this._addCol, "+");
 
             this._minusCol = domConstruct.create("div", {
-                'class': "modifier-btn subtract-btn",
-                'innerHTML': "&#8722;"
+                'class': "modifier-btn subtract-btn"
             }, this._colModifier);
 
             this._createInnerText(this._minusCol, "&#8722;");
