@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: head ('Composer | Printer page')"></head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+    <!--/*@thymesVar id="size" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="orientation" type="java.lang.String"*/-->
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'portrait'"
+           type="text/css">
+        .size.orientation {
+            width: 8.3in;
+            height:  11.7in;
+        }
+    </style>
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'landscape'"
+           type="text/css">
+        .size.orientation {
+            width: 11.7in;
+            height: 8.0in;
+        }
+    </style>
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'portrait'"
+           type="text/css">
+        .size.orientation {
+            width: 11.7in;
+            height:  16.5in;
+        }
+    </style>
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'landscape'"
+           type="text/css">
+        .size.orientation {
+            width: 16.5in;
+            height:  11.4in;
+        }
+    </style>
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'portrait'"
+           type="text/css">
+        .size.orientation {
+            width: 8.4in;
+            height:  11in;
+        }
+    </style>
+    <style th:if="${atlas.size} eq 'a4' and ${atlas.orientation} eq 'landscape'"
+           type="text/css">
+        .size.orientation {
+            width: 11in;
+            height:  8.2in;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="size orientation"></div>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        require([
+            "esri/map"
+            ,"dojo/on"
+            ,"dojo/dom"
+            ,"esri/layers/ArcGISTiledMapServiceLayer"
+            ,"esri/geometry/Extent"
+            ,"dojo/domReady!"
+        ], function (Map, on, dom, Tiled, Extent) {
+            var initialExtent = new Extent({
+                xmin: parseFloat(/*[[${atlas.extent.xmin}]]*/ '0'),
+                ymin: parseFloat(/*[[${atlas.extent.ymin}]]*/ '0'),
+                xmax: parseFloat(/*[[${atlas.extent.xmax}]]*/ '0'),
+                ymax: parseFloat(/*[[${atlas.extent.ymax}]]*/ '0'),
+                spatialReference: {
+                    wkid: 3346
+                }
+            });
+
+            var map = new Map("map", {
+                slider: false,
+                extent: initialExtent
+            });
+            var tiled = new Tiled("http://www.geoportal.lt/arcgis/rest/services/geoportal_public/background_Lietuva-3346/MapServer");
+            map.addLayer(tiled);
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

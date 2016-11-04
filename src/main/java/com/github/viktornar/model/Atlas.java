@@ -30,4 +30,15 @@ public class Atlas {
     @Getter
     @Setter
     private Integer zoom = 4;
+
+    public void copyBean(Atlas fromBean) {
+        this.setAtlasFolder(fromBean.getAtlasFolder());
+        this.setAtlasName(fromBean.getAtlasName());
+        this.setColumns(fromBean.getColumns());
+        this.setExtent(fromBean.getExtent());
+        this.setOrientation(fromBean.getOrientation());
+        this.setRows(fromBean.getRows());
+        this.setSize(fromBean.getSize());
+        this.setZoom(fromBean.getZoom());
+    }
 }

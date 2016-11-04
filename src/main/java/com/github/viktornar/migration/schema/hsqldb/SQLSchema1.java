@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used for creating spring security tables for users registration implementation.
- *
  * @author v.nareiko
  */
 public class SQLSchema1 extends Schema {
