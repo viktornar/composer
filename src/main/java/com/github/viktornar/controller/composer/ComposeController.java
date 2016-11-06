@@ -3,6 +3,7 @@ package com.github.viktornar.controller.composer;
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
 import com.github.viktornar.task.PrintTask;
+
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import static java.lang.String.format;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +39,7 @@ public class ComposeController {
     public String postCompose(@ModelAttribute("atlas") Atlas atlas, final RedirectAttributes redirectAttributes) {
         String id = getRandomlyNames(8, 1)[0];
 
-        atlas.setAtlasFolder(atlasFolder + "/" + id);
+        atlas.setAtlasFolder(format("%s/%s", atlasFolder, id));
         atlas.setAtlasName(atlasNamePrefix + id);
 
         final int POOL_SIZE = atlas.getColumns() * atlas.getRows() + 2;
@@ -107,15 +109,15 @@ public class ComposeController {
     @RequestMapping(value = "/download/{id}", method = RequestMethod.GET)
     public void getFile(@PathVariable("id") String id, HttpServletResponse response) {
         try {
-            String _atlasFolder = atlasFolder + "/" + id;
-            String _atlasName = atlasNamePrefix + id + ".pdf";
+            String _atlasFolder = format("%s/%s", atlasFolder, id);
+            String _atlasName = format("%s%s.pdf", atlasNamePrefix, id);
 
-            String filePathToBeServed = _atlasFolder + "/" + _atlasName;
+            String filePathToBeServed = format("%s/%s", _atlasFolder, _atlasName);
             File fileToDownload = new File(filePathToBeServed);
             InputStream inputStream = new FileInputStream(fileToDownload);
 
             response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=" + _atlasName);
+            response.setHeader("Content-Disposition", format("attachment; filename=%s", _atlasName));
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (IOException ex) {

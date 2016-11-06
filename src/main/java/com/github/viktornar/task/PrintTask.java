@@ -2,6 +2,7 @@ package com.github.viktornar.task;
 
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
+
 import static com.github.viktornar.utils.Helper.createAtlasFolder;
 import static com.github.viktornar.utils.Helper.mergePages;
 
@@ -22,14 +23,21 @@ import static com.github.viktornar.utils.Helper.getExtentOfPage;
 public class PrintTask implements Callable<String> {
     @Value("${atlas.command}")
     private String printCommand;
+    @Value("${server.port}")
+    private String port;
+    private String hostname;
+
     private Atlas atlas;
     private ExecutorService executorService;
+
+    private static final String DEFAUT_HOSTNNAME = "localhost";
     private static final String DEFAULT_PRINT_CMD = "wkhtmltopdf " +
             "-s %s " +
-            "-O %s" +
-            " --no-stop-slow-scripts " +
+            "-O %s " +
+            "--no-stop-slow-scripts " +
             "--javascript-delay 7000 " +
-            "http://localhost:9000/composer/print?xmin=%f&ymin=%f&xmax=%f&ymax=%f&size=%s&orientation=%s %s/%s-%s-%s.pdf";
+            "\"http://%s:%s/composer/print?xmin=%f&ymin=%f&xmax=%f&ymax=%f&size=%s&orientation=%s\" " +
+            "\"%s/%s-%s-%s.pdf\"";
 
     public PrintTask(ExecutorService executorService, Atlas atlas) {
         this.executorService = executorService;
@@ -47,15 +55,22 @@ public class PrintTask implements Callable<String> {
 
     private String getCommand(Atlas atlas, int row, int column) {
         String _printCommand = DEFAULT_PRINT_CMD;
+        String _hostname = DEFAUT_HOSTNNAME;
 
         if (printCommand != null) {
             _printCommand = printCommand;
+        }
+
+        if (hostname != null) {
+            _hostname = hostname;
         }
 
         return String.format(Locale.US,
                 _printCommand,
                 StringUtils.capitalize(atlas.getSize()),
                 StringUtils.capitalize(atlas.getOrientation()),
+                _hostname,
+                port,
                 atlas.getExtent().getXmin(),
                 atlas.getExtent().getYmin(),
                 atlas.getExtent().getXmax(),
@@ -84,6 +99,7 @@ public class PrintTask implements Callable<String> {
                         Atlas atlasPage = new Atlas();
                         atlasPage.copyBean(atlas);
                         atlasPage.setExtent(pageExtent);
+                        System.out.println(" [x] Printing job command: " + getCommand(atlasPage, row, column));
                         process = Runtime.getRuntime().exec(getCommand(atlasPage, row, column));
                         process.waitFor();
                     } catch (Exception e) {

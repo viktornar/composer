@@ -1,20 +1,20 @@
 package com.github.viktornar.configuration;
 
 import com.github.viktornar.migration.dao.DaoHelper;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Main application configuration.
@@ -40,17 +40,15 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
         this.env = env;
     }
 
-    /**
-     * Get datasource for JDBC template.
-     */
     @Profile("development")
-    @Bean
+    @Bean(destroyMethod = "close")
     public DataSource dataSource() {
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        return builder
-                .setType(EmbeddedDatabaseType.HSQL)
-                .setName("composer")
-                .build();
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+        dataSource.setUrl("jdbc:hsqldb:file:C:/Tmp/atlas/database/testdb");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
+        return dataSource;
     }
 
     /**
@@ -60,7 +58,7 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
      * @return The helper data access object
      */
     @Bean
-    DaoHelper daoHelperDev(DataSource dataSource) {
+    DaoHelper daoHelper(DataSource dataSource) {
         // Use false here. If you specify true instead false you will drop all tables
         // after application shutdown.
         return new DaoHelper(dataSource, false);

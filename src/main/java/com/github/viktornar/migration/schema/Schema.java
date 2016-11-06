@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.*;
 
 import java.util.List;
+import static java.lang.String.format;
 
 /**
  * Used for creating and evolving the database schema.
@@ -42,7 +43,7 @@ public abstract class Schema {
         assert table != null && !table.isEmpty();
 
         try {
-            template.execute(String.format("select 1 from %s", table));
+            template.execute(format("select 1 from %s", table));
         } catch (Exception x) {
             return false;
         }
@@ -63,7 +64,7 @@ public abstract class Schema {
         assert table != null && !table.isEmpty();
 
         try {
-            template.execute(String.format("select %s from %s where 1 = 0", column, table));
+            template.execute(format("select %s from %s where 1 = 0", column, table));
         } catch (Exception ex) {
             return false;
         }
@@ -87,7 +88,7 @@ public abstract class Schema {
 
         try {
             Integer rowCount = template.queryForObject(
-                    String.format("select count(*) from %s where %s", table, whereClause),
+                    format("select count(*) from %s where %s", table, whereClause),
                     Integer.class
             );
             return rowCount > 0;
@@ -108,11 +109,11 @@ public abstract class Schema {
 
         if (tablesToDrop.size() > 0) {
             String tableList = join(tablesToDrop.toArray(), ", ");
-            String dropSql = String.format("DROP TABLE %s", tableList);
+            String dropSql = format("DROP TABLE %s", tableList);
             template.execute(dropSql);
-            logger.info(String.format("Database tables '%s' was dropped successfully.", tableList));
+            logger.info(format("Database tables '%s' was dropped successfully.", tableList));
         } else {
-            logger.info(String.format("There are no tables to drop in database."));
+            logger.info(format("There are no tables to drop in database."));
         }
     }
 }
