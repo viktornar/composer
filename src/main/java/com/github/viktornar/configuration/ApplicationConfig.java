@@ -1,6 +1,10 @@
 package com.github.viktornar.configuration;
 
+import com.github.viktornar.dao.AtlasDao;
+import com.github.viktornar.dao.ExtentDao;
 import com.github.viktornar.migration.dao.DaoHelper;
+import com.github.viktornar.service.repository.Repository;
+import com.github.viktornar.service.repository.RepositoryDao;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +49,7 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:file:C:/Tmp/atlas/database/testdb");
+        dataSource.setUrl("jdbc:hsqldb:file:D:/Tmp/atlas/database/composer_db");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;
@@ -62,6 +66,11 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
         // Use false here. If you specify true instead false you will drop all tables
         // after application shutdown.
         return new DaoHelper(dataSource, false);
+    }
+
+    @Bean
+    Repository repository(AtlasDao atlasDao, ExtentDao extentDao){
+        return new RepositoryDao(atlasDao, extentDao);
     }
 
     /**

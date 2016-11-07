@@ -2,12 +2,9 @@ package com.github.viktornar.task;
 
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
-
-import static com.github.viktornar.utils.Helper.createAtlasFolder;
-import static com.github.viktornar.utils.Helper.mergePages;
-
+import com.github.viktornar.service.SettingsService;
+import com.github.viktornar.service.repository.Repository;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,30 +15,40 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.IntStream;
 
-import static com.github.viktornar.utils.Helper.getExtentOfPage;
+import static com.github.viktornar.utils.Helper.*;
 
 public class PrintTask implements Callable<String> {
-    @Value("${atlas.command}")
-    private String printCommand;
-    @Value("${server.port}")
     private String port;
     private String hostname;
+    private String contextPath;
 
     private Atlas atlas;
+    private Repository repository;
     private ExecutorService executorService;
 
-    private static final String DEFAUT_HOSTNNAME = "localhost";
+    private static final String DEFAULT_PORT = "9000";
+    private static final String DEFAULT_HOSTNAME = "localhost";
+    private static final String DEFAULT_CONTEXT_PATH = "composer";
     private static final String DEFAULT_PRINT_CMD = "wkhtmltopdf " +
             "-s %s " +
             "-O %s " +
             "--no-stop-slow-scripts " +
             "--javascript-delay 7000 " +
-            "\"http://%s:%s/composer/print?xmin=%f&ymin=%f&xmax=%f&ymax=%f&size=%s&orientation=%s\" " +
+            "\"http://%s:%s%s/print?xmin=%f&ymin=%f&xmax=%f&ymax=%f&size=%s&orientation=%s\" " +
             "\"%s/%s-%s-%s.pdf\"";
 
-    public PrintTask(ExecutorService executorService, Atlas atlas) {
-        this.executorService = executorService;
-        this.atlas = atlas;
+    public PrintTask(ExecutorService _executorService,
+                     Atlas _atlas,
+                     Repository _repository,
+                     SettingsService settingsService
+    ) {
+        executorService = _executorService;
+        atlas = _atlas;
+        repository = _repository;
+
+        port = settingsService.getPort();
+        contextPath = settingsService.getContextPath();
+        hostname = settingsService.getHostname();
     }
 
     @Override
@@ -54,23 +61,29 @@ public class PrintTask implements Callable<String> {
     }
 
     private String getCommand(Atlas atlas, int row, int column) {
-        String _printCommand = DEFAULT_PRINT_CMD;
-        String _hostname = DEFAUT_HOSTNNAME;
-
-        if (printCommand != null) {
-            _printCommand = printCommand;
-        }
+        String _hostname = DEFAULT_HOSTNAME;
+        String _contextPath = DEFAULT_CONTEXT_PATH;
+        String _port = DEFAULT_PORT;
 
         if (hostname != null) {
             _hostname = hostname;
         }
 
+        if (contextPath != null) {
+            _contextPath = contextPath;
+        }
+
+        if (port != null) {
+            _port = port;
+        }
+
         return String.format(Locale.US,
-                _printCommand,
+                DEFAULT_PRINT_CMD,
                 StringUtils.capitalize(atlas.getSize()),
                 StringUtils.capitalize(atlas.getOrientation()),
                 _hostname,
-                port,
+                _port,
+                _contextPath,
                 atlas.getExtent().getXmin(),
                 atlas.getExtent().getYmin(),
                 atlas.getExtent().getXmax(),
@@ -93,7 +106,6 @@ public class PrintTask implements Callable<String> {
                 futures.add(executorService.submit(() -> {
                     final Process process;
                     try {
-                        // TODO: update printing progress
                         System.out.println(" [x] Start printing job [row:'" + row + "' , column:'" + column + "'] : '" + atlas.toString() + "'");
                         Extent pageExtent = getExtentOfPage(atlas, column, row);
                         Atlas atlasPage = new Atlas();
@@ -112,7 +124,11 @@ public class PrintTask implements Callable<String> {
         futures.forEach(future -> {
             try {
                 future.get();
+                Atlas _atlas = repository.getAtlasById(atlas.getId());
+                _atlas.setProgress(_atlas.getProgress() + 1);
+                repository.updateAtlas(_atlas);
                 System.out.println(" [x] Finished printing job: '" + atlas.toString() + "'");
+                Thread.sleep(1000); // Sleep thread for 1 s for printing progress successful update
             } catch (InterruptedException | ExecutionException e) {
                 System.out.println(" [x] Error on printing job: '" + atlas.toString() + "'");
                 throw new RuntimeException(e);

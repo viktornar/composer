@@ -25,7 +25,7 @@ public class ExtentDao extends BaseDao {
         super(_daoHelper);
     }
 
-    public void update(Extent extent) {
+    public void create(Extent extent) {
         String sql = format("INSERT INTO EXTENT (%s) VALUES (%s)", EXTENT_COLUMNS, questionMarks(EXTENT_COLUMNS));
 
         KeyHolder keyHolder = new GeneratedKeyHolder();

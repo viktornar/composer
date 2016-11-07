@@ -45,10 +45,10 @@ public class Atlas {
     private String atlasFolder = "atlas";
     @Getter
     @Setter
-    private Integer columns = 2;
+    private Integer columns;
     @Getter
     @Setter
-    private Integer rows = 1;
+    private Integer rows;
 
     @Getter
     private Extent extent;
@@ -65,13 +65,13 @@ public class Atlas {
     private String size = "letter";
     @Getter
     @Setter
-    private Integer zoom = 4;
+    private Integer zoom;
     @Getter
     @Setter
     private Integer progress = 0;
     @Getter
     @Setter
-    private Integer extentId = 0;
+    private Integer extentId;
 
     public void copyBean(Atlas fromBean) {
         setAtlasFolder(fromBean.getAtlasFolder());

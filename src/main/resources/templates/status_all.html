@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="atlasName" type="java.lang.String"*/-->
+<!--/*@thymesVar id="id" type="java.lang.String"*/-->
+<!--/*@thymesVar id="allAtlases" type="java.util.List"*/-->
+<!--/*@thymesVar id="atlas" type="com.github.viktornar.model.Atlas"*/-->
+<head th:include="fragments/header :: head ('Composer | Printer page')"></head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+        .container {
+            margin-top: 30px;
+            width: 970px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row" style="height: 100px;">
+        <div class="twelve columns col-centered">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Download url
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="atlas, row : ${allAtlases}"
+                    th:object="${atlas}">
+                    <td th:text="${atlas.id}"></td>
+                    <td th:text="${atlas.atlasName}"></td>
+                    <td>
+                    <a href="#" th:href="@{/download/{id}(id=*{id})}"
+                             th:text="${atlas.atlasName} + '.pdf'">Name</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

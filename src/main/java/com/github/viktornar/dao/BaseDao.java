@@ -34,7 +34,7 @@ class BaseDao {
      *
      * @return The JDBC template.
      */
-    protected JdbcTemplate getJdbcTemplate() {
+    JdbcTemplate getJdbcTemplate() {
         return daoHelper.getJdbcTemplate();
     }
 
@@ -53,7 +53,7 @@ class BaseDao {
      * @param columns The columns in table
      * @return The columns as question marks
      */
-    public String questionMarks(@NonNull String columns) {
+    String questionMarks(@NonNull String columns) {
         int count = columns.split(", ").length;
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < count; i++) {
@@ -68,7 +68,7 @@ class BaseDao {
     /**
      * Add prefix to given column names.
      *
-     * @param columns The comma seperated columns in string e.g. \"NAME1, NAME2\".
+     * @param columns The comma separated columns in string e.g. \"NAME1, NAME2\".
      * @param prefix  The prefix to use in table column.
      * @return columns names with given prefix
      */
@@ -84,13 +84,32 @@ class BaseDao {
     }
 
     /**
+     * Add suffix to given column names.
+     *
+     * @param columns The comma separated columns in string e.g. \"NAME1, NAME2\".
+     * @param suffix  The suffix to use in table column.
+     * @return columns names with given suffix
+     */
+    protected String suffix(@NonNull String columns, @NonNull String suffix) {
+        StringBuilder builder = new StringBuilder();
+
+        for (String s : columns.split(", ")) {
+            builder.append(s).append(suffix).append(",");
+        }
+        if (builder.length() > 0) {
+            builder.setLength(builder.length() - 1);
+        }
+        return builder.toString();
+    }
+
+    /**
      * Update table by given values.
      *
      * @param sql  The sql statement to execute.
-     * @param args The column values to update in table.
+     * @param args The column values to create in table.
      * @return The number of updated rows.
      */
-    protected int update(@NonNull String sql, @NonNull Object... args) {
+    int update(@NonNull String sql, @NonNull Object... args) {
         long t = System.nanoTime();
         int result = getJdbcTemplate().update(sql, args);
         log(sql, t);
@@ -120,7 +139,7 @@ class BaseDao {
      * @param <T>       The type that will be mapped to location.
      * @return The query location as list with given type.
      */
-    protected <T> List<T> query(@NonNull String sql, @NonNull RowMapper rowMapper) {
+    <T> List<T> query(@NonNull String sql, @NonNull RowMapper rowMapper) {
         long t = System.nanoTime();
         List<T> result = getJdbcTemplate().query(sql, rowMapper);
         log(sql, t);
@@ -255,7 +274,7 @@ class BaseDao {
     /**
      * Similar to {@link #query(String, RowMapper, Object...)}, but returns only first record
      */
-    protected <T> T queryOne(@NonNull String sql, @NonNull RowMapper rowMapper, @NonNull Object... args) {
+    <T> T queryOne(@NonNull String sql, @NonNull RowMapper rowMapper, @NonNull Object... args) {
         List<T> list = query(sql, rowMapper, args);
         return list.isEmpty() ? null : list.get(0);
     }

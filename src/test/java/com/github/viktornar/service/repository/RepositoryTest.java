@@ -1,8 +1,9 @@
-package com.github.viktornar.dao;
+package com.github.viktornar.service.repository;
 
 import com.github.viktornar.configuration.ApplicationConfig;
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,26 +18,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.viktornar.utils.Helper.getRandomlyNames;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationConfig.class})
+@ContextConfiguration(classes = {ApplicationConfig.class})
 @ActiveProfiles({"default", "development"})
-public class AtlasDaoTest {
+public class RepositoryTest {
     @Autowired
     private ApplicationContext applicationContext;
-    private AtlasDao atlasDao;
-    private ExtentDao extentDao;
-    private List<Atlas> atlases;
+    Repository repository;
+    private List<Extent> extents;
 
     @Before
-    public void setUp() {
-        atlasDao = (AtlasDao)applicationContext.getBean("atlasDao");
-        extentDao = (ExtentDao)applicationContext.getBean("extentDao");
-
-        List<Extent> extents = Arrays.asList(
+    public void setUp() throws Exception {
+        repository = (Repository) applicationContext.getBean("repository");
+        extents = Arrays.asList(
                 new Extent(
                         null,
                         1.0,
@@ -52,10 +47,11 @@ public class AtlasDaoTest {
                         2.0
                 )
         );
+    }
 
-        atlases = new ArrayList<>();
+    @Test
+    public void createAtlas() throws Exception {
         extents.forEach((extent)->{
-            extentDao.create(extent);
             Atlas atlas = new Atlas(
                     getRandomlyNames(8, 1)[0],
                     "atlas",
@@ -66,49 +62,38 @@ public class AtlasDaoTest {
                     "letter",
                     0,
                     0,
-                    extent.getId()
+                    null
             );
 
             atlas.setExtent(extent);
-            atlases.add(atlas);
+            repository.createAtlas(atlas);
         });
     }
 
     @Test
-    public void update() throws Exception {
-        atlases.forEach((atlas)->{
-            atlasDao.create(atlas);
+    public void updateAtlas() throws Exception {
+        extents.forEach((extent)->{
+            String id = getRandomlyNames(8, 1)[0];
+            Atlas atlas = new Atlas(
+                    id,
+                    "atlas",
+                    "atlas",
+                    1,
+                    1,
+                    "portrait",
+                    "letter",
+                    0,
+                    0,
+                    null
+            );
+
+            atlas.setExtent(extent);
+            repository.createAtlas(atlas);
+
+            atlas = repository.getAtlasById(id);
+            atlas.setProgress(5);
+
+            repository.updateAtlas(atlas);
         });
     }
-
-    @Test
-    public void updateById() throws Exception {
-        atlases.forEach((atlas)->{
-            atlasDao.create(atlas);
-            atlas.setProgress(atlas.getColumns());
-            atlasDao.update(atlas);
-        });
-    }
-
-    @Test
-    public void getById() throws Exception {
-        atlases.forEach((atlas)->{
-            String id = atlas.getId();
-            atlasDao.create(atlas);
-            Atlas _atlas = atlasDao.getById(id);
-            assertEquals(id, _atlas.getId());
-        });
-    }
-
-    @Test
-    public void getAll() throws Exception {
-        atlases.forEach((atlas)->{
-            atlasDao.create(atlas);
-        });
-
-        List<Atlas> _atlases = atlasDao.getAll();
-
-        assertNotNull(_atlases);
-        assertTrue(_atlases.size() > 0);
-    }
-};
+}

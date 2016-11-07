@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -17,15 +16,16 @@ import static java.lang.String.format;
 public class AtlasDao extends BaseDao {
     private static final String ATLAS_COLUMNS =
             "id, " +
-            "atlas_name, " +
-            "atlas_folder, " +
-            "columns, " +
-            "rows, " +
-            "orientation, " +
-            "size, " +
-            "zoom, " +
-            "progress, " +
-            "extent_id";
+                    "atlas_name, " +
+                    "atlas_folder, " +
+                    "columns, " +
+                    "rows, " +
+                    "orientation, " +
+                    "size, " +
+                    "zoom, " +
+                    "progress, " +
+                    "extent_id";
+
     private AtlasRowMapper atlasRowMapper = new AtlasRowMapper();
 
     @Autowired
@@ -33,7 +33,7 @@ public class AtlasDao extends BaseDao {
         super(_daoHelper);
     }
 
-    public void update(Atlas atlas) {
+    public void create(Atlas atlas) {
         assert atlas.getExtent() != null;
         assert atlas.getId() != null;
 
@@ -50,6 +50,27 @@ public class AtlasDao extends BaseDao {
                 atlas.getZoom(),
                 atlas.getProgress(),
                 atlas.getExtent().getId()
+        );
+    }
+
+    public void update(Atlas atlas) {
+        assert atlas.getExtent() != null;
+        assert atlas.getId() != null;
+
+        String sql = format("UPDATE ATLAS SET %s WHERE id=?", suffix(ATLAS_COLUMNS.replace("id, ", ""), "=?"));
+
+        getJdbcTemplate().update(
+                sql,
+                atlas.getAtlasName(),
+                atlas.getAtlasFolder(),
+                atlas.getColumns(),
+                atlas.getRows(),
+                atlas.getOrientation(),
+                atlas.getSize(),
+                atlas.getZoom(),
+                atlas.getProgress(),
+                atlas.getExtent().getId(),
+                atlas.getId()
         );
     }
 

@@ -2,9 +2,11 @@ package com.github.viktornar.controller.composer;
 
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
+import com.github.viktornar.service.SettingsService;
 import com.github.viktornar.task.PrintTask;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,7 +19,10 @@ import static java.lang.String.format;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+
+import com.github.viktornar.service.repository.Repository;
 
 import static com.github.viktornar.utils.Helper.*;
 
@@ -29,11 +34,18 @@ import static com.github.viktornar.utils.Helper.*;
 @Controller
 @RequestMapping("/")
 public class ComposeController {
-    private ExecutorService executorService;
     @Value("${atlas.folder}")
     private String atlasFolder;
     @Value("${atlas.name.prefix}")
     private String atlasNamePrefix;
+    private Repository repository;
+    private SettingsService settingsService;
+
+    @Autowired
+    public ComposeController(Repository _repository, SettingsService _settingsService) {
+        repository = _repository;
+        settingsService = _settingsService;
+    }
 
     @RequestMapping(value="/compose", method = RequestMethod.POST)
     public String postCompose(@ModelAttribute("atlas") Atlas atlas, final RedirectAttributes redirectAttributes) {
@@ -42,11 +54,12 @@ public class ComposeController {
         atlas.setAtlasFolder(format("%s/%s", atlasFolder, id));
         atlas.setAtlasName(atlasNamePrefix + id);
 
+        atlas.setId(id);
+        repository.createAtlas(atlas);
+
         final int POOL_SIZE = atlas.getColumns() * atlas.getRows() + 2;
         ExecutorService executorService = getExecutorService(POOL_SIZE);
-        runPrintTask(executorService, atlas);
-
-        // TODO: Save atlas model to database
+        runPrintTask(executorService, atlas, repository, settingsService);
 
         redirectAttributes
                 .addAttribute("id", id);
@@ -55,11 +68,10 @@ public class ComposeController {
     }
 
     @RequestMapping(value="/status/{id}", method = RequestMethod.GET)
-    public String postCompose(@PathVariable("id") String id,
+    public String statusById(@PathVariable("id") String id,
                               ModelMap model,
                               @RequestParam(value = "timeout", required = true) int timeout) {
-
-        // TODO: get atlas properties from database
+        Atlas atlas = repository.getAtlasById(id);
 
         if(timeout > 0){
             timeout -= 1;
@@ -71,18 +83,27 @@ public class ComposeController {
         model.addAttribute("timeout", timeout);
         model.addAttribute("fileExist", isFileExist(id, atlasFolder, atlasNamePrefix));
         model.addAttribute("atlasId", id);
+        model.addAttribute("atlasExecutionProgress", atlas.getProgress());
+        model.addAttribute("atlasExecutionTotal", atlas.getRows()*atlas.getColumns());
 
-        return "status";
+        return "status_by_id";
+    }
+
+    @RequestMapping(value="/status", method = RequestMethod.GET)
+    public String statusAll(ModelMap model) {
+        List<Atlas> atlases = repository.getAllAtlases();
+        model.addAttribute("allAtlases", atlases);
+        return "status_all";
     }
 
     @RequestMapping(value = "/print", method = RequestMethod.GET)
     public String displayById(
-            @RequestParam(value = "orientation", required = true) String orientation,
-            @RequestParam(value = "size", required = true) String size,
-            @RequestParam(value = "xmin", required = true) Double xmin,
-            @RequestParam(value = "ymin", required = true) Double ymin,
-            @RequestParam(value = "xmax", required = true) Double xmax,
-            @RequestParam(value = "ymax", required = true) Double ymax,
+            @RequestParam(value = "orientation") String orientation,
+            @RequestParam(value = "size") String size,
+            @RequestParam(value = "xmin") Double xmin,
+            @RequestParam(value = "ymin") Double ymin,
+            @RequestParam(value = "xmax") Double xmax,
+            @RequestParam(value = "ymax") Double ymax,
             ModelMap model
     ) {
 
@@ -125,7 +146,7 @@ public class ComposeController {
         }
     }
 
-    private void runPrintTask(ExecutorService executorService, Atlas atlas) {
-        executorService.submit(new PrintTask(executorService, atlas));
+    private void runPrintTask(ExecutorService executorService, Atlas atlas, Repository repository, SettingsService settingsService) {
+        executorService.submit(new PrintTask(executorService, atlas, repository, settingsService));
     }
 }

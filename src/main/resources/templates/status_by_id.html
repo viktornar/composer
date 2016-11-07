@@ -4,13 +4,15 @@
 <!--/*@thymesVar id="errorExist" type="java.lang.Boolean"*/-->
 <!--/*@thymesVar id="atlasId" type="java.lang.String"*/-->
 <!--/*@thymesVar id="timeout" type="java.lang.Integer"*/-->
+<!--/*@thymesVar id="atlasExecutionProgress" type="java.lang.String"*/-->
+<!--/*@thymesVar id="atlasExecutionTotal" type="java.lang.String"*/-->
 <head th:include="fragments/header :: head ('Composer | Printer page')"></head>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <meta th:if="${fileExist} ne true and ${errorExist} ne true"
           http-equiv="refresh"
-          th:attr="content=${'3; url=' + #httpServletRequest.getContextPath() +'/status/'+ atlasId + '?timeout=' + timeout}"
+          th:attr="content=${'1; url=' + #httpServletRequest.getContextPath() +'/status/'+ atlasId + '?timeout=' + timeout}"
     />
     <style type="text/css">
         .container {
@@ -26,10 +28,16 @@
             <div th:if="${fileExist} eq true" class="list-group">
                 <a class="list-group-item"
                    th:href="${#httpServletRequest.getContextPath() + '/download/' + atlasId}"
-                    th:utext="${'Sugeneruotas atlasas: atlasas-' + atlasId + '.pdf'}" ></a>
+                    th:utext="${'Generated atlas: atlasas-' + atlasId + '.pdf'}" ></a>
+                <a class="list-group-item"
+                   th:href="${#httpServletRequest.getContextPath() + '/status'}"
+                   th:utext="'See all generated atlases'" ></a>
             </div>
             <div th:if="${fileExist} ne true and ${errorExist} ne true">
-                <p class="lead">Atlasas generuojamas, prašome palaukti ...</p>
+                <p class="lead"
+                   th:utext="'Atlas generation is in progress (generated ' + ${atlasExecutionProgress} + ' from ' + ${atlasExecutionTotal} + '), please wait ...'">
+                    Atlas generation is in progress, please wait ...
+                </p>
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped active"
                          role="progressbar" aria-valuenow="100" aria-valuemin="0"
@@ -41,11 +49,11 @@
                     <div class="col-md-12">
                         <div class="error-template">
                             <h3>
-                                Įvyko nenumatyta klaida
+                                An unexpected error occurred!
                             </h3>
                             <div class="error-actions">
                                 <a href="#" class="btn btn-default btn-lg">
-                                    <span class="glyphicon glyphicon-envelope"></span>Susisiekite su administratoriumi
+                                    <span class="glyphicon glyphicon-envelope"></span>Inform administrator
                                 </a>
                             </div>
                         </div>

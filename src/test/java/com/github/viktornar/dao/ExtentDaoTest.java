@@ -1,7 +1,6 @@
 package com.github.viktornar.dao;
 
 import com.github.viktornar.configuration.ApplicationConfig;
-import com.github.viktornar.migration.dao.DaoHelper;
 import com.github.viktornar.model.Extent;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class ExtentDaoTest {
                 1.0
         );
 
-        extentDao.update(extent);
+        extentDao.create(extent);
         assertNotNull(extent.getId());
 
         Extent extentById = extentDao.getById(extent.getId());
