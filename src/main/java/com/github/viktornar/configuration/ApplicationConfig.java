@@ -63,7 +63,7 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:file:D:/Tmp/atlas/database/composer_db");
+        dataSource.setUrl("jdbc:hsqldb:mem:composer_db");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
         return dataSource;
