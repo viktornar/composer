@@ -1,13 +1,13 @@
 Composer - Web application for creating map atlas.
 ==================================================
 Composer is a simple web application  that can be used for creating map atlas by using Lithuanian online base map that are distributed by National Land Agency.
-![image](https://raw.githubusercontent.com/viktornar/composer/master/img/1.png)
+![image](https://raw.githubusercontent.com/viktornar/composer/master/img/1.PNG)
 
-![image](https://raw.githubusercontent.com/viktornar/composer/master/img/2.png)
+![image](https://raw.githubusercontent.com/viktornar/composer/master/img/2.PNG)
 
-![image](https://raw.githubusercontent.com/viktornar/composer/master/img/3.png)
+![image](https://raw.githubusercontent.com/viktornar/composer/master/img/3.PNG)
 
-![image](https://raw.githubusercontent.com/viktornar/composer/master/img/4.png)
+![image](https://raw.githubusercontent.com/viktornar/composer/master/img/4.PNG)
 
 The main technologies (frameworks, libraries) that was used in project
 -------------
