@@ -1,9 +1,22 @@
+/*
+ This file is part of Composer.
+ Composer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ Subsonic is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with Subsonic.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2016 (C) Viktor Nareiko
+ */
 package com.github.viktornar.service.repository;
 
 import com.github.viktornar.configuration.ApplicationConfig;
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +26,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +63,7 @@ public class RepositoryTest {
 
     @Test
     public void createAtlas() throws Exception {
-        extents.forEach((extent)->{
+        extents.forEach((extent) -> {
             Atlas atlas = new Atlas(
                     getRandomlyNames(8, 1)[0],
                     "atlas",
@@ -72,7 +84,7 @@ public class RepositoryTest {
 
     @Test
     public void updateAtlas() throws Exception {
-        extents.forEach((extent)->{
+        extents.forEach((extent) -> {
             String id = getRandomlyNames(8, 1)[0];
             Atlas atlas = new Atlas(
                     id,

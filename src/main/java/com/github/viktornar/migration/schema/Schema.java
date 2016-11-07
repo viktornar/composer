@@ -1,12 +1,28 @@
+/*
+ This file is part of Composer.
+ Composer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ Subsonic is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with Subsonic.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2016 (C) Viktor Nareiko
+ */
+
 package com.github.viktornar.migration.schema;
 
-import static org.apache.commons.lang3.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.join;
 
 /**
  * Used for creating and evolving the database schema.
@@ -15,7 +31,7 @@ import static java.lang.String.format;
  * @author v.nareiko
  */
 public abstract class Schema {
-    Logger logger = LoggerFactory.getLogger(Schema.class);
+    private Logger logger = LoggerFactory.getLogger(Schema.class);
 
     /**
      * Executes this schema.
@@ -81,7 +97,7 @@ public abstract class Schema {
      * @return Whether the row exists.
      */
 
-    protected boolean rowExists( JdbcTemplate template, String whereClause, String table) {
+    protected boolean rowExists(JdbcTemplate template, String whereClause, String table) {
         assert template != null;
         assert whereClause != null && !whereClause.isEmpty();
         assert table != null && !table.isEmpty();

@@ -1,10 +1,24 @@
+/*
+ This file is part of Composer.
+ Composer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ Subsonic is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with Subsonic.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2016 (C) Viktor Nareiko
+ */
 package com.github.viktornar.controller.composer;
 
 import com.github.viktornar.model.Atlas;
 import com.github.viktornar.model.Extent;
 import com.github.viktornar.service.SettingsService;
+import com.github.viktornar.service.repository.Repository;
 import com.github.viktornar.task.PrintTask;
-
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,16 +29,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import static java.lang.String.format;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import com.github.viktornar.service.repository.Repository;
-
 import static com.github.viktornar.utils.Helper.*;
+import static java.lang.String.format;
 
 /**
  * Main page controller. Will be displayed by default.
@@ -47,7 +59,7 @@ public class ComposeController {
         settingsService = _settingsService;
     }
 
-    @RequestMapping(value="/compose", method = RequestMethod.POST)
+    @RequestMapping(value = "/compose", method = RequestMethod.POST)
     public String postCompose(@ModelAttribute("atlas") Atlas atlas, final RedirectAttributes redirectAttributes) {
         String id = getRandomlyNames(8, 1)[0];
 
@@ -67,16 +79,16 @@ public class ComposeController {
         return "redirect:/status/{id}?timeout=30";
     }
 
-    @RequestMapping(value="/status/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/status/{id}", method = RequestMethod.GET)
     public String statusById(@PathVariable("id") String id,
-                              ModelMap model,
-                              @RequestParam(value = "timeout", required = true) int timeout) {
+                             ModelMap model,
+                             @RequestParam(value = "timeout", required = true) int timeout) {
         Atlas atlas = repository.getAtlasById(id);
 
-        if(timeout > 0){
+        if (timeout > 0) {
             timeout -= 1;
             model.addAttribute("errorExist", false);
-        }else{
+        } else {
             model.addAttribute("errorExist", true);
         }
 
@@ -84,12 +96,12 @@ public class ComposeController {
         model.addAttribute("fileExist", isFileExist(id, atlasFolder, atlasNamePrefix));
         model.addAttribute("atlasId", id);
         model.addAttribute("atlasExecutionProgress", atlas.getProgress());
-        model.addAttribute("atlasExecutionTotal", atlas.getRows()*atlas.getColumns());
+        model.addAttribute("atlasExecutionTotal", atlas.getRows() * atlas.getColumns());
 
         return "status_by_id";
     }
 
-    @RequestMapping(value="/status", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     public String statusAll(ModelMap model) {
         List<Atlas> atlases = repository.getAllAtlases();
         model.addAttribute("allAtlases", atlases);
@@ -123,7 +135,6 @@ public class ComposeController {
     }
 
     /**
-     *
      * @param id
      * @param response
      */

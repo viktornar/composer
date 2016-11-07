@@ -1,3 +1,17 @@
+/*
+ This file is part of Composer.
+ Composer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ Subsonic is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with Subsonic.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2016 (C) Viktor Nareiko
+ */
 package com.github.viktornar.task;
 
 import com.github.viktornar.model.Atlas;
@@ -5,6 +19,8 @@ import com.github.viktornar.model.Extent;
 import com.github.viktornar.service.SettingsService;
 import com.github.viktornar.service.repository.Repository;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -17,7 +33,11 @@ import java.util.stream.IntStream;
 
 import static com.github.viktornar.utils.Helper.*;
 
+import static java.lang.String.format;
+
 public class PrintTask implements Callable<String> {
+    private Logger logger = LoggerFactory.getLogger(PrintTask.class);
+
     private String port;
     private String hostname;
     private String contextPath;
@@ -57,7 +77,7 @@ public class PrintTask implements Callable<String> {
         assert executorService != null;
         executeCommand(atlas);
         executorService.shutdown();
-        return atlas.getAtlasFolder() + "/" + atlas.getAtlasName() + ".pdf";
+        return format("%s/%s.pdf", atlas.getAtlasFolder(), atlas.getAtlasName());
     }
 
     private String getCommand(Atlas atlas, int row, int column) {
@@ -106,12 +126,12 @@ public class PrintTask implements Callable<String> {
                 futures.add(executorService.submit(() -> {
                     final Process process;
                     try {
-                        System.out.println(" [x] Start printing job [row:'" + row + "' , column:'" + column + "'] : '" + atlas.toString() + "'");
+                        logger.info(format(" [x] Start printing job [row:'%s', column: '%s'] : '%s'", row, column, atlas.toString()));
                         Extent pageExtent = getExtentOfPage(atlas, column, row);
                         Atlas atlasPage = new Atlas();
                         atlasPage.copyBean(atlas);
                         atlasPage.setExtent(pageExtent);
-                        System.out.println(" [x] Printing job command: " + getCommand(atlasPage, row, column));
+                        logger.info(format(" [x] Printing job command: '%s'", getCommand(atlasPage, row, column)));
                         process = Runtime.getRuntime().exec(getCommand(atlasPage, row, column));
                         process.waitFor();
                     } catch (Exception e) {
@@ -127,14 +147,14 @@ public class PrintTask implements Callable<String> {
                 Atlas _atlas = repository.getAtlasById(atlas.getId());
                 _atlas.setProgress(_atlas.getProgress() + 1);
                 repository.updateAtlas(_atlas);
-                System.out.println(" [x] Finished printing job: '" + atlas.toString() + "'");
+                logger.info(format(" [x] Finished printing job: '%s'", atlas.toString()));
                 Thread.sleep(1000); // Sleep thread for 1 s for printing progress successful update
             } catch (InterruptedException | ExecutionException e) {
-                System.out.println(" [x] Error on printing job: '" + atlas.toString() + "'");
+                logger.error(format(" [x] Error on printing job: '%s'", atlas.toString()));
                 throw new RuntimeException(e);
             }
         });
 
-        mergePages(atlas.getAtlasFolder(), atlas.getAtlasName() + ".pdf");
+        mergePages(atlas.getAtlasFolder(), format("%s.pdf", atlas.getAtlasName()));
     }
 }

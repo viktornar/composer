@@ -1,3 +1,17 @@
+/*
+ This file is part of Composer.
+ Composer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ Subsonic is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with Subsonic.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2016 (C) Viktor Nareiko
+ */
 package com.github.viktornar.dao;
 
 import com.github.viktornar.configuration.ApplicationConfig;
@@ -11,11 +25,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationConfig.class})
+@ContextConfiguration(classes = {ApplicationConfig.class})
 @ActiveProfiles({"default", "development"})
 public class ExtentDaoTest {
     @Autowired
@@ -24,7 +38,7 @@ public class ExtentDaoTest {
 
     @Before
     public void setUp() {
-        extentDao = (ExtentDao)applicationContext.getBean("extentDao");
+        extentDao = (ExtentDao) applicationContext.getBean("extentDao");
     }
 
     @Test
