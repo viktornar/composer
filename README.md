@@ -25,8 +25,8 @@ The main technologies (frameworks, libraries) that was used in project
 
 Application architecture
 ------------------------
-In application MVC architecture was used by using Spring MVC. wkhtmltopdf was used as pdf renderer from html page converting into pdf. For atlas distinct page printing in separate threads by using external wkhtmltopdf process java ExecutorService was used. Application principle schema are displayed below.
-![image]()
+In application MVC architecture was used by using Spring MVC. wkhtmltopdf was used as pdf renderer from html page converting into pdf. For atlas distinct page printing in separate threads by using external wkhtmltopdf process java ExecutorService was used. How application works is described in principle schema displayed below.
+![image](https://raw.githubusercontent.com/viktornar/composer/master/img/5.PNG)
 
 How to build and run project
 -------------
@@ -40,6 +40,9 @@ Go to the project directory:
 $ cd composer
 ```
 
+> **Note:**
+> Before run application make sure you have properly configured application. Go to [project_home]/src/main/resources/application.properties and change `atlas.folder` property according to your OS. On windows it could be atlas.folder=D:/Tmp/atlas and on Linux it could be atlas.folder=/tmp/atlas.
+
 On Windows OS run:
 ```bash
 mvnw.cmd spring-boot:run
@@ -50,4 +53,4 @@ On Linux OS run:
 $ chmod u+x mvnw && ./mvnw spring-boot:run
 ```
 
-Maven will download dependencies, build project and generate startup script to start web application in console. After launching startup script application will be accessible from the web browser through http://localhost:9000/ address.
+Maven will download dependencies, build project and generate startup script to start web application in console. After launching startup script application will be accessible from the web browser through http://localhost:9000/composer address.
